@@ -1,8 +1,10 @@
-﻿namespace Nik.Common;
+﻿using Nik.Dbs.Abstractions;
+
+namespace Nik.Dbs;
 
 public static class ServicesExtensions
 {
-    public static IServiceCollection AddNikCommon(this IServiceCollection services)
+    public static IServiceCollection AddNikDbs(this IServiceCollection services)
     {
         services.AddSingleton<IDbScaffolder, DbScaffolder>();
 

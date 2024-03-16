@@ -1,0 +1,16 @@
+{
+  "ScaffoldDefinition": {
+    "ConnectionStringName": "eazybusiness",
+    "OutputPath": "C:\\output",
+    "Tables": [
+      {
+        "TableName": "tBestellung",
+        "ClassName": "JtlOrder"
+      },
+      {
+        "TableName": "tBestellPos",
+        "ClassName": "JtlOrderPosition"
+      }
+    ]
+  }
+}

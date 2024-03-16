@@ -29,7 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nik.Db.Abstractions\Nik.Db.Abstractions.csproj" />
+    <ProjectReference Include="..\Nik.Dbs.Abstractions\Nik.Dbs.Abstractions.csproj" />
+    <ProjectReference Include="..\Nik.Dbs.Models\Nik.Dbs.Models.csproj" />
   </ItemGroup>
 
 </Project>
