@@ -14,6 +14,10 @@
       {
         "TableName": "tAdresse",
         "ClassName": "JtlAddress"
+      },
+      {
+        "TableName": "tKunde",
+        "ClassName": "JtlCustomer"
       }
     ]
   }
