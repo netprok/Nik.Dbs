@@ -47,7 +47,7 @@ public class DbScaffolder(
 
         // adding table attribute to the class
         stringBuilder.AppendLine($"    [Table(\"{table.TableName}\")]");
-        stringBuilder.AppendLine($"    public class {table.ClassName}Model");
+        stringBuilder.AppendLine($"    public class {table.ClassName}");
         stringBuilder.AppendLine("    {");
 
         List<Field> fields = [];
