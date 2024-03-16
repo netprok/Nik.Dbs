@@ -7,6 +7,13 @@ public class DbScaffolder(
     private const string CsExtension = ".cs";
     private const string DataTypeField = "DATA_TYPE";
     private const string ColumnNameField = "COLUMN_NAME";
+    private const string IsNullableField = "IS_NULLABLE";
+    private const string OrdinalPositionName = "ORDINAL_POSITION";
+    private const string CharacterMaximumLengthName = "CHARACTER_MAXIMUM_LENGTH";
+    private const string NummericPrecisionName = "NUMERIC_PRECISION";
+    private const string NumericScaleName = "NUMERIC_SCALE";
+    private static readonly string[] decimalTypes = ["decimal", "float", "real"];
+    private static readonly string[] textTypes = ["nvarchar", "varchar", "char", "nchar"];
 
     public async Task ScaffoldAsync(ScaffoldDefinition scaffoldDefinition)
     {
@@ -42,45 +49,36 @@ public class DbScaffolder(
         stringBuilder.AppendLine($"    public class {table.ClassName}Model");
         stringBuilder.AppendLine("    {");
 
+        List<Field> fields = [];
+
         // generating properties for each column
         foreach (DataRow row in schemaTable.Rows)
         {
-            string columnName = row[ColumnNameField].ToString() ?? throw new ArgumentNullException("ColumnName");
-            var propertyName = scaffoldPropertyNameGenerater.Generate(columnName);
+            fields.Add(GenerateField(row, table.TableName) ?? throw new ArgumentNullException("Field"));
+        }
 
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                continue;
-            }
-
-            var dataType = row[DataTypeField].ToString();
-            if (string.IsNullOrWhiteSpace(dataType))
-            {
-                continue;
-            }
-
+        foreach (var field in fields.OrderBy(field => field.OrdinalPosition))
+        {
             // adding column attribute to each property
-            stringBuilder.AppendLine($"        [Column(\"{columnName}\")]");
+            stringBuilder.AppendLine($"        [Column(\"{field.ColumnName}\")]");
 
             // handling string length
-            if (dataType == "nvarchar")
+            if (textTypes.Contains(field.DataType))
             {
-                var maxLength = int.TryParse(row["CHARACTER_MAXIMUM_LENGTH"].ToString(), out int len) ? len : 0;
-                if (maxLength > 0)
+                if (field.MaxLength > 0)
                 {
-                    stringBuilder.AppendLine($"        [MaxLength({maxLength})]");
+                    stringBuilder.AppendLine($"        [MaxLength({field.MaxLength})]");
                 }
             }
 
             // handling precision for numeric types
-            if (dataType == "decimal" || dataType == "float" || dataType == "real")
+            if (decimalTypes.Contains(field.DataType))
             {
-                var precision = int.TryParse(row["NUMERIC_PRECISION"].ToString(), out int prec) ? prec : 0;
-                stringBuilder.AppendLine($"        [Precision({precision})]");
+                stringBuilder.AppendLine($"        [Precision({field.NumericPrecision}, {field.NumericScale})]");
             }
 
             // generating property
-            stringBuilder.AppendLine($"        public {GetCSharpType(dataType)} {propertyName} {{ get; set; }}");
+            stringBuilder.AppendLine($"        public {field.PropertyType} {field.PropertyName} {{ get; set; }}");
             stringBuilder.AppendLine();
         }
 
@@ -91,9 +89,42 @@ public class DbScaffolder(
         return stringBuilder.ToString();
     }
 
-    private string GetCSharpType(string dataType, int length = 0)
+    private Field? GenerateField(DataRow row, string tableName)
     {
-        var type = dataType switch
+        var columnName = row[ColumnNameField].ToString() ?? throw new ArgumentNullException("ColumnName");
+        var propertyName = scaffoldPropertyNameGenerater.Generate(columnName, tableName);
+
+        if (string.IsNullOrWhiteSpace(propertyName))
+        {
+            return null;
+        }
+
+        var dataType = row[DataTypeField].ToString();
+        if (string.IsNullOrWhiteSpace(dataType))
+        {
+            return null;
+        }
+
+        Field field = new()
+        {
+            ColumnName = columnName,
+            DataType = dataType,
+            OrdinalPosition = Convert.ToInt32(row[OrdinalPositionName].ToString()),
+            PropertyName = propertyName,
+            IsNullable = row[IsNullableField].ToString()?.ToLower() == "yes",
+            MaxLength = int.TryParse(row[CharacterMaximumLengthName].ToString(), out int len) ? len : 0,
+            NumericPrecision = int.TryParse(row[NummericPrecisionName].ToString(), out int prec) ? prec : 0,
+            NumericScale = int.TryParse(row[NumericScaleName].ToString(), out int scale) ? scale : 0,
+        };
+
+        GeneratePropertyType(field);
+
+        return field;
+    }
+
+    private static void GeneratePropertyType(Field field)
+    {
+        var propertyType = field.DataType switch
         {
             "int" => "int",
             "tinyint" => "short",
@@ -109,11 +140,29 @@ public class DbScaffolder(
             _ => "object",
         };
 
-        if (length == 1 && dataType == "char")
+        if (field.MaxLength == 1 && field.DataType == "char")
         {
-            type = "char";
+            propertyType = "char";
         }
 
-        return type;
+        if (field.IsNullable)
+        {
+            propertyType += '?';
+        }
+
+        field.PropertyType = propertyType;
+    }
+
+    private class Field
+    {
+        public string ColumnName { get; internal set; } = string.Empty;
+        public string PropertyName { get; internal set; } = string.Empty;
+        public string DataType { get; internal set; } = string.Empty;
+        public string PropertyType { get; internal set; } = string.Empty;
+        public int OrdinalPosition { get; internal set; }
+        public bool IsNullable { get; internal set; }
+        public int MaxLength { get; internal set; }
+        public int NumericPrecision { get; internal set; }
+        public int NumericScale { get; internal set; }
     }
 }

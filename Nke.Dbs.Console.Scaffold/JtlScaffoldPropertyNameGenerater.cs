@@ -2,27 +2,43 @@
 
 public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
 {
-    public string Generate(string columnName)
+    private const string UnknownColumnFormatError = "Unknown column format";
+
+    public string Generate(string columnName, string tableName)
     {
-        string propertyName = columnName;
-        if (columnName.StartsWith('k'))
+        if (!char.IsUpper(columnName[1]))
         {
-            propertyName = columnName[1..] + "Id";
-        }
-        else if (columnName.Length > 4 && columnName.StartsWith('t') && columnName.Contains("_k"))
-        {
-            int index = columnName.LastIndexOf("_k");
-            propertyName = columnName[1..index] + "Id";
-        }
-        else if (columnName.StartsWith('d'))
-        {
-            propertyName = columnName[1..] + "Time";
-        }
-        else if (columnName.StartsWith('c') || columnName.StartsWith('f') || columnName.StartsWith('n'))
-        {
-            propertyName = columnName[1..];
+            throw new Exception(UnknownColumnFormatError);
         }
 
-        return propertyName;
+        // key
+        if (columnName.StartsWith('k'))
+        {
+            // primary key
+            if (tableName[1..] == columnName[1..])
+            {
+                return "Id";
+            }
+            // foreign key
+            return columnName[1..] + "Id";
+        }
+        // foreign key
+        if (columnName.Length > 4 && columnName.StartsWith('t') && columnName.Contains("_k"))
+        {
+            int index = columnName.LastIndexOf("_k");
+            return columnName[1..index] + "Id";
+        }
+        // date time
+        if (columnName.StartsWith('d'))
+        {
+            return columnName[1..] + "Time";
+        }
+        // other types
+        if (columnName.StartsWith('c') || columnName.StartsWith('f') || columnName.StartsWith('n'))
+        {
+            return columnName[1..];
+        }
+
+        throw new Exception(UnknownColumnFormatError);
     }
 }

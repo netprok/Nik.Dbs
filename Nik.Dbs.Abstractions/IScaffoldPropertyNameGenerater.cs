@@ -2,6 +2,6 @@
 {
     public interface IScaffoldPropertyNameGenerater
     {
-        string Generate(string columnName);
+        string Generate(string columnName, string tableName);
     }
 }
