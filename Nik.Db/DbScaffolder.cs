@@ -1,6 +1,4 @@
-﻿using Nik.Db.Abstractions;
-
-namespace Nik.Db;
+﻿namespace Nik.Db;
 
 public class DbScaffolder(ITextFileWriter textFileWriter) : IDbScaffolder
 {
