@@ -26,7 +26,14 @@ public class DbScaffolder(
         foreach (var table in scaffoldDefinition.Tables)
         {
             var classContent = GenerateTableClass(connection, table);
-            await textFileWriter.WriteAsync(Path.Combine(scaffoldDefinition.OutputPath, table.ClassName + CsExtension), classContent);
+            var fileName = Path.Combine(scaffoldDefinition.OutputPath, table.ClassName + CsExtension);
+
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            await textFileWriter.WriteAsync(fileName, classContent);
         }
 
         connection.Close();
@@ -60,26 +67,13 @@ public class DbScaffolder(
 
         foreach (var field in fields.OrderBy(field => field.OrdinalPosition))
         {
-            // adding column attribute to each property
-            stringBuilder.AppendLine($"        [Column(\"{field.ColumnName}\")]");
-
-            // handling string length
-            if (textTypes.Contains(field.DataType))
+            foreach (var attribute in field.Attributes)
             {
-                if (field.MaxLength > 0)
-                {
-                    stringBuilder.AppendLine($"        [MaxLength({field.MaxLength})]");
-                }
-            }
-
-            // handling precision for numeric types
-            if (decimalTypes.Contains(field.DataType))
-            {
-                stringBuilder.AppendLine($"        [Precision({field.NumericPrecision}, {field.NumericScale})]");
+                stringBuilder.AppendLine($"        " + attribute);
             }
 
             // generating property
-            stringBuilder.AppendLine($"        public {field.PropertyType} {field.PropertyName} {{ get; set; }}");
+            stringBuilder.AppendLine($"        public {field.PropertyType} {field.PropertyName} {{ get; set; }}" + field.Initialization);
             stringBuilder.AppendLine();
         }
 
@@ -118,9 +112,44 @@ public class DbScaffolder(
             NumericScale = int.TryParse(row[NumericScaleName].ToString(), out int scale) ? scale : 0,
         };
 
+        GenerateAttributes(field);
         GeneratePropertyType(field);
+        GenerateInitialization(field);
 
         return field;
+    }
+
+    private void GenerateInitialization(Field field)
+    {
+        if (field.DataType == "timestamp")
+        {
+            field.Initialization = " = Array.Empty<byte>();";
+        }
+        else if (field.PropertyType == "string" && !field.IsNullable)
+        {
+            field.Initialization = " = string.Empty;";
+        }
+    }
+
+    private static void GenerateAttributes(Field field)
+    {
+        field.Attributes.Add($"[Column(\"{field.ColumnName}\")]");
+
+        if (textTypes.Contains(field.DataType))
+        {
+            if (field.MaxLength > 0)
+            {
+                field.Attributes.Add($"[MaxLength({field.MaxLength})]");
+            }
+        }
+        else if (decimalTypes.Contains(field.DataType))
+        {
+            field.Attributes.Add($"[Precision({field.NumericPrecision}, {field.NumericScale})]");
+        }
+        else if (field.DataType == "timestamp")
+        {
+            field.Attributes.Add($"[Timestamp]");
+        }
     }
 
     private static void GeneratePropertyType(Field field)
@@ -138,6 +167,7 @@ public class DbScaffolder(
             "decimal" => "decimal",
             "float" => "double",
             "real" => "float",
+            "timestamp" => "byte[]",
             _ => "object",
         };
 
@@ -165,5 +195,7 @@ public class DbScaffolder(
         public int MaxLength { get; internal set; }
         public int NumericPrecision { get; internal set; }
         public int NumericScale { get; internal set; }
+        public List<string> Attributes { get; internal set; } = [];
+        public string? Initialization { get; set; }
     }
 }
