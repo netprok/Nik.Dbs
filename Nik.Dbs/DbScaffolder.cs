@@ -25,7 +25,7 @@ public class DbScaffolder(
 
         foreach (var table in scaffoldDefinition.Tables)
         {
-            var classContent = GenerateTableClass(connection, table);
+            var classContent = GenerateTableClass(connection, table, scaffoldDefinition);
             var fileName = Path.Combine(scaffoldDefinition.OutputPath, table.ClassName + CsExtension);
 
             if (File.Exists(fileName))
@@ -39,27 +39,34 @@ public class DbScaffolder(
         connection.Close();
     }
 
-    private string GenerateTableClass(SqlConnection connection, ScaffoldDefinitionTable table)
+    private string GenerateTableClass(SqlConnection connection, ScaffoldDefinitionTable table, ScaffoldDefinition scaffoldDefinition)
     {
         var schemaTable = connection.GetSchema("Columns", [null, null, table.TableName]);
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        // generating namespace and class declaration
-        stringBuilder.AppendLine("using System;");
-        stringBuilder.AppendLine("using System.ComponentModel.DataAnnotations.Schema;");
-        stringBuilder.AppendLine();
-        stringBuilder.AppendLine("namespace GeneratedModels");
-        stringBuilder.AppendLine("{");
+        if (scaffoldDefinition.AddUsings)
+        {
+            stringBuilder.AppendLine("""
+            using System;
+            using System.ComponentModel.DataAnnotations.Schema;
 
-        // adding table attribute to the class
-        stringBuilder.AppendLine($"    [Table(\"{table.TableName}\")]");
-        stringBuilder.AppendLine($"    public class {table.ClassName}");
-        stringBuilder.AppendLine("    {");
+            """);
+        }
+
+        if (!string.IsNullOrWhiteSpace(scaffoldDefinition.Namespace))
+        {
+            stringBuilder.AppendLine($""" 
+                namespace {scaffoldDefinition.Namespace};
+
+                """);
+        }
+        stringBuilder.AppendLine($"[Table(\"{table.TableName}\")]");
+        stringBuilder.AppendLine($"public class {table.ClassName}");
+        stringBuilder.AppendLine("{");
 
         List<Field> fields = [];
 
-        // generating properties for each column
         foreach (DataRow row in schemaTable.Rows)
         {
             fields.Add(GenerateField(row, table.TableName) ?? throw new ArgumentNullException("Field"));
@@ -69,16 +76,13 @@ public class DbScaffolder(
         {
             foreach (var attribute in field.Attributes)
             {
-                stringBuilder.AppendLine($"        " + attribute);
+                stringBuilder.AppendLine($"    " + attribute);
             }
 
-            // generating property
-            stringBuilder.AppendLine($"        public {field.PropertyType} {field.PropertyName} {{ get; set; }}" + field.Initialization);
+            stringBuilder.AppendLine($"    public {field.PropertyType} {field.PropertyName} {{ get; set; }}" + field.Initialization);
             stringBuilder.AppendLine();
         }
 
-        // closing class declaration
-        stringBuilder.AppendLine("    }");
         stringBuilder.AppendLine("}");
 
         return stringBuilder.ToString();
@@ -104,8 +108,8 @@ public class DbScaffolder(
         {
             ColumnName = columnName,
             DataType = dataType,
-            OrdinalPosition = Convert.ToInt32(row[OrdinalPositionName].ToString()),
             PropertyName = propertyName,
+            OrdinalPosition = Convert.ToInt32(row[OrdinalPositionName].ToString()),
             IsNullable = sqlBooleanValues.Contains(row[IsNullableField].ToString()?.ToLower()),
             MaxLength = int.TryParse(row[CharacterMaximumLengthName].ToString(), out int len) ? len : 0,
             NumericPrecision = int.TryParse(row[NummericPrecisionName].ToString(), out int prec) ? prec : 0,

@@ -2,6 +2,8 @@
   "ScaffoldDefinition": {
     "ConnectionStringName": "eazybusiness",
     "OutputPath": "C:\\output",
+    "AddUsings": false,
+    "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
         "TableName": "tBestellung",

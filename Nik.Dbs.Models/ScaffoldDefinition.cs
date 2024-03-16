@@ -7,6 +7,10 @@ public class ScaffoldDefinition
     public string OutputPath { get; set; } = string.Empty;
 
     public ScaffoldDefinitionTable[] Tables { get; set; } = [];
+
+    public bool AddUsings { get; set; } = true;
+
+    public string? Namespace { get; set; }
 }
 
 public class ScaffoldDefinitionTable
