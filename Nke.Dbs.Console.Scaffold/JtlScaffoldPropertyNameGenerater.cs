@@ -3,9 +3,15 @@
 public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
 {
     private const string UnknownColumnFormatError = "Unknown column format";
+    private static readonly char[] validStartCharacters = ['k', 't', 'd', 'c', 'f', 'n', 'b'];
 
     public string Generate(string columnName, string tableName)
     {
+        if (!validStartCharacters.Contains(columnName[0]))
+        {
+            throw new Exception(UnknownColumnFormatError);
+        }
+
         if (!char.IsUpper(columnName[1]))
         {
             throw new Exception(UnknownColumnFormatError);
@@ -33,12 +39,7 @@ public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
         {
             return columnName[1..] + "Time";
         }
-        // other types
-        if (columnName.StartsWith('c') || columnName.StartsWith('f') || columnName.StartsWith('n'))
-        {
-            return columnName[1..];
-        }
 
-        throw new Exception(UnknownColumnFormatError);
+        return columnName[1..];
     }
 }
