@@ -14,6 +14,7 @@ public class DbScaffolder(
     private const string NumericScaleName = "NUMERIC_SCALE";
     private static readonly string[] decimalTypes = ["decimal", "float", "real"];
     private static readonly string[] textTypes = ["nvarchar", "varchar", "char", "nchar"];
+    private static readonly string[] sqlBooleanValues = ["yes", "y"];
 
     public async Task ScaffoldAsync(ScaffoldDefinition scaffoldDefinition)
     {
@@ -111,7 +112,7 @@ public class DbScaffolder(
             DataType = dataType,
             OrdinalPosition = Convert.ToInt32(row[OrdinalPositionName].ToString()),
             PropertyName = propertyName,
-            IsNullable = row[IsNullableField].ToString()?.ToLower() == "yes",
+            IsNullable = sqlBooleanValues.Contains(row[IsNullableField].ToString()?.ToLower()),
             MaxLength = int.TryParse(row[CharacterMaximumLengthName].ToString(), out int len) ? len : 0,
             NumericPrecision = int.TryParse(row[NummericPrecisionName].ToString(), out int prec) ? prec : 0,
             NumericScale = int.TryParse(row[NumericScaleName].ToString(), out int scale) ? scale : 0,
