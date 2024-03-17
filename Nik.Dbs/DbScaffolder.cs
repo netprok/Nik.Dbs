@@ -127,7 +127,7 @@ public class DbScaffolder(
     {
         if (field.DataType == "timestamp")
         {
-            field.Initialization = " = Array.Empty<byte>();";
+            field.Initialization = " = [];";
         }
         else if (field.PropertyType == "string" && !field.IsNullable)
         {
