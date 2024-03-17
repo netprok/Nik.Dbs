@@ -1,7 +1,6 @@
-﻿namespace Nik.Dbs.Abstractions
+﻿namespace Nik.Dbs.Abstractions;
+
+public interface IScaffoldPropertyNameGenerater
 {
-    public interface IScaffoldPropertyNameGenerater
-    {
-        string Generate(string columnName, string tableName);
-    }
+    string Generate(string columnName, string tableName);
 }

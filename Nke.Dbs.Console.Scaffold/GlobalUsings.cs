@@ -9,3 +9,4 @@ global using Nik.Files;
 
 global using Nke.Dbs.Console.Scaffold;global using System;
 global using System.Linq;
+global using Nik.Common;
