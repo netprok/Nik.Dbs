@@ -2,6 +2,11 @@
   "InsertStatementDefinitions": {
     "ConnectionStringName": "eazybusiness",
     "OutputPath": "C:\\output",
-    "Tables": [ "tBestellung" ]
+    "Tables": [
+      {
+        "TableName": "tAuftrag",
+        "FullTableName": "verkauf.tAuftrag"
+      }
+    ]
   }
 }

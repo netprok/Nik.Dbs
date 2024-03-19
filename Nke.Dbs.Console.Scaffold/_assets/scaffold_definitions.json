@@ -6,15 +6,15 @@
     "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
-        "TableName": "tBestellung",
+        "TableName": "tAuftrag",
         "ClassName": "JtlOrder"
       },
       {
-        "TableName": "tBestellPos",
+        "TableName": "verkauf.tAuftragPosition",
         "ClassName": "JtlOrderPosition"
       },
       {
-        "TableName": "tAdresse",
+        "TableName": "verkauf.tAuftragAdresse",
         "ClassName": "JtlAddress"
       },
       {

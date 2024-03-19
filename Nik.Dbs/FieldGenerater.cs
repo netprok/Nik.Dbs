@@ -5,12 +5,12 @@ public sealed class FieldGenerater(
 {
     private const string DataTypeField = "DATA_TYPE";
     private const string ColumnNameField = "COLUMN_NAME";
-    private const string IsNullableField = "IS_NULLABLE";
+    private const string IsNullableName = "IS_NULLABLE";
+    private const string IsIdentityName = "IS_IDENTITY";
     private const string OrdinalPositionName = "ORDINAL_POSITION";
     private const string CharacterMaximumLengthName = "CHARACTER_MAXIMUM_LENGTH";
     private const string NummericPrecisionName = "NUMERIC_PRECISION";
     private const string NumericScaleName = "NUMERIC_SCALE";
-    private static readonly string[] sqlBooleanValues = ["yes"];
 
     public List<Field> Generate(DataTable schemaTable, string tableName)
     {
@@ -46,7 +46,8 @@ public sealed class FieldGenerater(
             DataType = dataType,
             PropertyName = propertyName,
             OrdinalPosition = Convert.ToInt32(row[OrdinalPositionName].ToString()),
-            IsNullable = sqlBooleanValues.Contains(row[IsNullableField].ToString()?.ToLower()),
+            IsNullable = row[IsNullableName].ToString() == "True",
+            IsIdentity = row[IsIdentityName].ToString() == "True",
             MaxLength = int.TryParse(row[CharacterMaximumLengthName].ToString(), out int len) ? len : 0,
             NumericPrecision = int.TryParse(row[NummericPrecisionName].ToString(), out int prec) ? prec : 0,
             NumericScale = int.TryParse(row[NumericScaleName].ToString(), out int scale) ? scale : 0,

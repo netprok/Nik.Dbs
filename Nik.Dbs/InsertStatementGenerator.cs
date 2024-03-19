@@ -3,6 +3,7 @@
 public sealed class InsertStatementGenerator(
     ITextFileWriter textFileWriter,
     IRandomTextGenerator randomTextGenerator,
+    ISchemaTableGenerater schemaTableGenerater,
     IFieldGenerater fieldGenerater) : IInsertStatementGenerator
 {
     private const string SqlExtension = ".sql";
@@ -10,14 +11,12 @@ public sealed class InsertStatementGenerator(
     public async Task CreateAsync(InsertStatementDefinitions insertStatementDefinitions)
     {
         var connectionString = Context.Configuration.GetConnectionString(insertStatementDefinitions.ConnectionStringName);
-        using SqlConnection connection = new(connectionString);
 
-        await connection.OpenAsync();
-
-        foreach (var tableName in insertStatementDefinitions.Tables)
+        foreach (var table in insertStatementDefinitions.Tables)
         {
-            var classContent = GenerateInsertStatement(connection, tableName);
-            var fileName = Path.Combine(insertStatementDefinitions.OutputPath, "insert_" + tableName + SqlExtension);
+            var schemaTable = await schemaTableGenerater.GenerateAsync(connectionString!, table.TableName);
+            var classContent = GenerateInsertStatement(schemaTable, table.FullTableName, table.TableName);
+            var fileName = Path.Combine(insertStatementDefinitions.OutputPath, "insert_" + table.FullTableName + SqlExtension);
 
             if (File.Exists(fileName))
             {
@@ -26,20 +25,17 @@ public sealed class InsertStatementGenerator(
 
             await textFileWriter.WriteAsync(fileName, classContent);
         }
-
-        connection.Close();
     }
 
-    private string GenerateInsertStatement(SqlConnection connection, string tableName)
+    private string GenerateInsertStatement(DataTable schemaTable, string fullTableName, string tableName)
     {
-        var schemaTable = connection.GetSchema("Columns", [null, null, tableName]);
-        var fields = fieldGenerater.Generate(schemaTable, tableName);
+        var fields = fieldGenerater.Generate(schemaTable, tableName).Where(field => !field.IsIdentity && !field.IsNullable && field.DataType != "timestamp");
         var columnNames = fields.Select(p => p.ColumnName).ToList();
         Random random = new();
         var values = fields.Select(field => GenerateRandomValue(field, random)).ToList();
 
         return $"""
-            INSERT INTO {tableName} (
+            INSERT INTO {fullTableName} (
             {string.Join(Environment.NewLine + ",", columnNames)}
             ) VALUES (
             {string.Join(Environment.NewLine + ",", values)}
@@ -51,11 +47,11 @@ public sealed class InsertStatementGenerator(
     {
         if (new Type[] { typeof(short), typeof(int), typeof(decimal), typeof(float), typeof(double) }.Contains(field.PropertyType))
         {
-            return random.Next(1, 10).ToString();
+            return "1";
         }
         else if (field.PropertyType == typeof(string))
         {
-            return $"N'{randomTextGenerator.GenerateRandomText(field.MaxLength)}'";
+            return $"N'{randomTextGenerator.GenerateRandomText(Math.Min(field.MaxLength, 10))}'";
         }
         else if (field.PropertyType == typeof(char))
         {
@@ -63,13 +59,17 @@ public sealed class InsertStatementGenerator(
         }
         else if (field.PropertyType == typeof(bool))
         {
-            return $"{random.Next(2).ToString()}";
+            return $"{random.Next(2)}";
         }
         else if (field.PropertyType == typeof(DateTime))
         {
             DateTime startDate = new DateTime(2000, 1, 1);
             int range = (DateTime.Today - startDate).Days;
-            return $"'{startDate.AddDays(random.Next(range))}'";
+            return $"'{startDate.AddDays(random.Next(range)).ToString("s")}'";
+        }
+        else if (field.DataType == "timestamp")
+        {
+            return $"CURRENT_TIMESTAMP";
         }
         else
         {

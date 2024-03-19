@@ -2,6 +2,7 @@
 
 public sealed class DbScaffolder(
     ITextFileWriter textFileWriter,
+    ISchemaTableGenerater schemaTableGenerater,
     IFieldGenerater fieldGenerater) : IDbScaffolder
 {
     private const string CsExtension = ".cs";
@@ -11,13 +12,11 @@ public sealed class DbScaffolder(
     public async Task ScaffoldAsync(ScaffoldDefinition scaffoldDefinition)
     {
         var connectionString = Context.Configuration.GetConnectionString(scaffoldDefinition.ConnectionStringName);
-        using SqlConnection connection = new(connectionString);
-
-        await connection.OpenAsync();
 
         foreach (var table in scaffoldDefinition.Tables)
         {
-            var classContent = GenerateTableClass(connection, table, scaffoldDefinition);
+            var schemaTable = await schemaTableGenerater.GenerateAsync(connectionString!, table.TableName);
+            var classContent = GenerateTableClass(schemaTable, table, scaffoldDefinition);
             var fileName = Path.Combine(scaffoldDefinition.OutputPath, table.ClassName + CsExtension);
 
             if (File.Exists(fileName))
@@ -27,13 +26,10 @@ public sealed class DbScaffolder(
 
             await textFileWriter.WriteAsync(fileName, classContent);
         }
-
-        connection.Close();
     }
 
-    private string GenerateTableClass(SqlConnection connection, ScaffoldDefinitionTable table, ScaffoldDefinition scaffoldDefinition)
+    private string GenerateTableClass(DataTable schemaTable, ScaffoldDefinitionTable table, ScaffoldDefinition scaffoldDefinition)
     {
-        var schemaTable = connection.GetSchema("Columns", [null, null, table.TableName]);
         var fields = fieldGenerater.Generate(schemaTable, table.TableName);
 
         StringBuilder stringBuilder = new();

@@ -7,6 +7,7 @@ public static class ServicesExtensions
         services.AddSingleton<IDbScaffolder, DbScaffolder>();
         services.AddSingleton<IInsertStatementGenerator, InsertStatementGenerator>();
         services.AddSingleton<IFieldGenerater, FieldGenerater>();
+        services.AddSingleton<ISchemaTableGenerater, SchemaTableGenerater>();
 
         return services;
     }
