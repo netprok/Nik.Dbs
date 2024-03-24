@@ -58,7 +58,7 @@ public sealed class DbScaffolder(
         {
             stringBuilder.AppendLine(string.Join(Environment.NewLine, GenerateAttributes(field)));
 
-            stringBuilder.Append($"    public {field.PropertyType.Name}");
+            stringBuilder.Append($"    public {field.PropertyTypeName}");
             if (field.IsNullable)
             {
                 stringBuilder.Append("?");

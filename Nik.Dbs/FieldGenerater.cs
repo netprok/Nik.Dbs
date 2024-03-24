@@ -81,7 +81,20 @@ public sealed class FieldGenerater(
         {
             propertyType = typeof(char);
         }
-
+         
         field.PropertyType = propertyType;
+        field.PropertyTypeName = propertyType.Name switch
+        {
+            "Int32"=> "int",
+            "Int16" => "short",
+            "Boolean" => "bool",
+            "String" => "string",
+            "Char" => "char",
+            "Decimal" => "decimal",
+            "Single" => "float",
+            "Double" => "double",
+            "Byte[]" => "byte[]",
+            _ => propertyType.Name,
+        };
     }
 }

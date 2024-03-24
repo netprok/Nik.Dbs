@@ -6,6 +6,7 @@ public class Field
     public string PropertyName { get; set; } = string.Empty;
     public string DataType { get; set; } = string.Empty;
     public Type PropertyType { get; set; } = typeof(object);
+    public string PropertyTypeName { get; set; } = "object";
     public int OrdinalPosition { get; set; }
     public bool IsNullable { get; set; }
     public bool IsIdentity { get; set; }
