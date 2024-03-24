@@ -1,25 +1,25 @@
 {
   "ScaffoldDefinition": {
     "ConnectionStringName": "eazybusiness",
-    "OutputPath": "C:\\output",
+    "OutputPath": "C:\\_output",
     "AddUsings": false,
     "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
-        "TableName": "tAuftrag",
-        "ClassName": "JtlOrder"
+        "TableName": "verkauf.tAuftrag",
+        "ClassName": "Order"
       },
       {
         "TableName": "verkauf.tAuftragPosition",
-        "ClassName": "JtlOrderPosition"
+        "ClassName": "OrderPosition"
       },
       {
         "TableName": "verkauf.tAuftragAdresse",
-        "ClassName": "JtlAddress"
+        "ClassName": "Address"
       },
       {
         "TableName": "tKunde",
-        "ClassName": "JtlCustomer"
+        "ClassName": "Customer"
       }
     ]
   }

@@ -1,7 +1,7 @@
 {
   "InsertStatementDefinitions": {
     "ConnectionStringName": "eazybusiness",
-    "OutputPath": "C:\\output",
+    "OutputPath": "C:\\_output",
     "Tables": [
       {
         "TableName": "tAuftrag",
