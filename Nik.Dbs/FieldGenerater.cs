@@ -12,22 +12,22 @@ public sealed class FieldGenerater(
     private const string NummericPrecisionName = "NUMERIC_PRECISION";
     private const string NumericScaleName = "NUMERIC_SCALE";
 
-    public List<Field> Generate(DataTable schemaTable, string tableName)
+    public List<Field> Generate(DataTable schemaTable, TableBase table)
     {
         List<Field> fields = [];
 
         foreach (DataRow row in schemaTable.Rows)
         {
-            fields.Add(GenerateField(row, tableName) ?? throw new ArgumentNullException("Field"));
+            fields.Add(GenerateField(row, table) ?? throw new ArgumentNullException("Field"));
         }
 
         return fields;
     }
 
-    private Field? GenerateField(DataRow row, string tableName)
+    private Field? GenerateField(DataRow row, TableBase table)
     {
         var columnName = row[ColumnNameField].ToString() ?? throw new ArgumentNullException("ColumnName");
-        var propertyName = scaffoldPropertyNameGenerater.Generate(columnName, tableName);
+        var propertyName = scaffoldPropertyNameGenerater.Generate(columnName, table);
 
         if (string.IsNullOrWhiteSpace(propertyName))
         {
@@ -74,6 +74,7 @@ public sealed class FieldGenerater(
             "float" => typeof(double),
             "real" => typeof(float),
             "timestamp" => typeof(byte[]),
+            "uniqueidentifier" => typeof(Guid),
             _ => typeof(object),
         };
 

@@ -28,9 +28,9 @@ public sealed class DbScaffolder(
         }
     }
 
-    private string GenerateTableClass(DataTable schemaTable, ScaffoldDefinitionTable table, ScaffoldDefinition scaffoldDefinition)
+    private string GenerateTableClass(DataTable schemaTable, ScaffoldDefinition.Table table, ScaffoldDefinition scaffoldDefinition)
     {
-        var fields = fieldGenerater.Generate(schemaTable, table.TableName);
+        var fields = fieldGenerater.Generate(schemaTable, table);
 
         StringBuilder stringBuilder = new();
 

@@ -2,5 +2,5 @@
 
 public interface IFieldGenerater
 {
-    List<Field> Generate(DataTable schemaTable, string tableName);
+    List<Field> Generate(DataTable schemaTable, TableBase table);
 }

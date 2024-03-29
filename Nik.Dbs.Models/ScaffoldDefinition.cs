@@ -6,16 +6,14 @@ public class ScaffoldDefinition
 
     public string OutputPath { get; set; } = string.Empty;
 
-    public ScaffoldDefinitionTable[] Tables { get; set; } = [];
+    public Table[] Tables { get; set; } = [];
 
     public bool AddUsings { get; set; } = true;
 
     public string? Namespace { get; set; }
-}
 
-public class ScaffoldDefinitionTable
-{
-    public string TableName { get; set; } = string.Empty;
-
-    public string ClassName { get; set; } = string.Empty;
+    public class Table : TableBase
+    {
+        public string ClassName { get; set; } = string.Empty;
+    }
 }

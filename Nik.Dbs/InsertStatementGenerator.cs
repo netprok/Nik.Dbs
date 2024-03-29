@@ -15,7 +15,7 @@ public sealed class InsertStatementGenerator(
         foreach (var table in insertStatementDefinitions.Tables)
         {
             var schemaTable = await schemaTableGenerater.GenerateAsync(connectionString!, table.TableName);
-            var classContent = GenerateInsertStatement(schemaTable, table.FullTableName, table.TableName);
+            var classContent = GenerateInsertStatement(schemaTable, table);
             var fileName = Path.Combine(insertStatementDefinitions.OutputPath, "insert_" + table.FullTableName + SqlExtension);
 
             if (File.Exists(fileName))
@@ -27,15 +27,15 @@ public sealed class InsertStatementGenerator(
         }
     }
 
-    private string GenerateInsertStatement(DataTable schemaTable, string fullTableName, string tableName)
+    private string GenerateInsertStatement(DataTable schemaTable, InsertStatementDefinitions.Table table)
     {
-        var fields = fieldGenerater.Generate(schemaTable, tableName).Where(field => !field.IsIdentity && !field.IsNullable && field.DataType != "timestamp");
+        var fields = fieldGenerater.Generate(schemaTable, table).Where(field => !field.IsIdentity && !field.IsNullable && field.DataType != "timestamp");
         var columnNames = fields.Select(p => p.ColumnName).ToList();
         Random random = new();
         var values = fields.Select(field => GenerateRandomValue(field, random)).ToList();
 
         return $"""
-            INSERT INTO {fullTableName} (
+            INSERT INTO {table.FullTableName} (
             {string.Join(Environment.NewLine + ",", columnNames)}
             ) VALUES (
             {string.Join(Environment.NewLine + ",", values)}

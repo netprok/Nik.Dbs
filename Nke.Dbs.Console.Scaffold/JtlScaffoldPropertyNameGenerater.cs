@@ -5,8 +5,13 @@ public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
     private const string UnknownColumnFormatError = "Unknown column format";
     private static readonly char[] validStartCharacters = ['k', 't', 'd', 'c', 'f', 'n', 'b'];
 
-    public string Generate(string columnName, string tableName)
+    public string Generate(string columnName, TableBase table)
     {
+        if (!table.IsOriginal)
+        {
+            return columnName;
+        }
+
         if (!validStartCharacters.Contains(columnName[0]))
         {
             throw new Exception(UnknownColumnFormatError);
@@ -21,7 +26,7 @@ public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
         if (columnName.StartsWith('k'))
         {
             // primary key
-            if (tableName[1..] == columnName[1..])
+            if (table.TableName[1..] == columnName[1..])
             {
                 return "Id";
             }

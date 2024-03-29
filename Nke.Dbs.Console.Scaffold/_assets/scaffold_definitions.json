@@ -6,24 +6,9 @@
     "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
-        "TableName": "tAuftrag",
-        "ClassName": "Order"
-      },
-      {
-        "TableName": "tAuftragPosition",
-        "ClassName": "OrderPosition"
-      },
-      {
-        "TableName": "tAdresse",
-        "ClassName": "CustomerAddress"
-      },
-      {
-        "TableName": "tAuftragAdresse",
-        "ClassName": "OrderAddress"
-      },
-      {
-        "TableName": "tKunde",
-        "ClassName": "Customer"
+        "TableName": "_nke_partner",
+        "ClassName": "NkePartner",
+        "IsOriginal": "false"
       }
     ]
   }
