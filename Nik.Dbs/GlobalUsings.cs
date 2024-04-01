@@ -18,3 +18,5 @@ global using System.Linq;
 global using Nik.Common.Abstractions;
 global using System.ComponentModel.DataAnnotations;
 global using System.Reflection;
+global using MongoDB.Bson.Serialization.Serializers;
+global using MongoDB.Bson.Serialization;
