@@ -4,8 +4,8 @@
     "OutputPath": "C:\\_output",
     "Tables": [
       {
-        "TableName": "tAuftrag",
-        "FullTableName": "verkauf.tAuftrag"
+        "TableName": "tkunde",
+        "FullTableName": "tkunde"
       }
     ]
   }
