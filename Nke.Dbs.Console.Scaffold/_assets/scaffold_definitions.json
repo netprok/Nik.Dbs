@@ -6,9 +6,9 @@
     "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
-        "TableName": "_nke_order_partner",
-        "ClassName": "NkeOrderPartner",
-        "IsOriginal": "false"
+        "TableName": "tArtikel",
+        "ClassName": "Product",
+        "IsOriginal": "true"
       }
     ]
   }
