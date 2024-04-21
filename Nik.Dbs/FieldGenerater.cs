@@ -63,7 +63,7 @@ public sealed class FieldGenerater(
         var propertyType = field.DataType switch
         {
             "int" => typeof(int),
-            "tinyint" => typeof(short),
+            "tinyint" => typeof(byte),
             "bit" => typeof(bool),
             "char" => typeof(string),
             "nchar" => typeof(string),
@@ -94,6 +94,7 @@ public sealed class FieldGenerater(
             "Decimal" => "decimal",
             "Single" => "float",
             "Double" => "double",
+            "Byte" => "byte",
             "Byte[]" => "byte[]",
             _ => propertyType.Name,
         };

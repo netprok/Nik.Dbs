@@ -6,8 +6,8 @@
     "Namespace": "Nke.Jtl.Models.Db",
     "Tables": [
       {
-        "TableName": "tArtikel",
-        "ClassName": "Product",
+        "TableName": "tZahlungsart",
+        "ClassName": "PaymentType",
         "IsOriginal": "true"
       }
     ]
