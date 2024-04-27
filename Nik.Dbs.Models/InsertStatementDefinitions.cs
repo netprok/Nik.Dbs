@@ -6,6 +6,10 @@ public class InsertStatementDefinitions
 
     public string OutputPath { get; set; } = string.Empty;
 
+    public bool IncludeNullable { get; set; } = true;
+
+    public bool GenerateRandomValue { get; set; } = true;
+
     public Table[] Tables { get; set; } = [];
 
     public class Table : TableBase

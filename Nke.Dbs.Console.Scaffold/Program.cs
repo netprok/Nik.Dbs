@@ -8,7 +8,9 @@ builder.Services
 
 using IHost host = builder.Build();
 
-await host.Services.GetService<IDbScaffolder>()!.ScaffoldAsync(Context.Configuration.GetSection<ScaffoldDefinition>()!);
-//await host.Services.GetService<IInsertStatementGenerator>()!.CreateAsync(Context.Configuration.GetSection<InsertStatementDefinitions>()!);
+//await host.Services.GetService<IDbScaffolder>()!.ScaffoldAsync(Context.Configuration.GetSection<ScaffoldDefinition>()!);
+await host.Services.GetService<IInsertStatementGenerator>()!.CreateAsync(Context.Configuration.GetSection<InsertStatementDefinitions>()!);
+
+Console.WriteLine("Tasks done.");
 
 await host.RunAsync();

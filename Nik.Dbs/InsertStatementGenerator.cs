@@ -8,15 +8,15 @@ public sealed class InsertStatementGenerator(
 {
     private const string SqlExtension = ".sql";
 
-    public async Task CreateAsync(InsertStatementDefinitions insertStatementDefinitions)
+    public async Task CreateAsync(InsertStatementDefinitions definitions)
     {
-        var connectionString = Context.Configuration.GetConnectionString(insertStatementDefinitions.ConnectionStringName);
+        var connectionString = Context.Configuration.GetConnectionString(definitions.ConnectionStringName);
 
-        foreach (var table in insertStatementDefinitions.Tables)
+        foreach (var table in definitions.Tables)
         {
             var schemaTable = await schemaTableGenerater.GenerateAsync(connectionString!, table.TableName);
-            var classContent = GenerateInsertStatement(schemaTable, table);
-            var fileName = Path.Combine(insertStatementDefinitions.OutputPath, "insert_" + table.FullTableName + SqlExtension);
+            var classContent = GenerateInsertStatement(schemaTable, table, definitions);
+            var fileName = Path.Combine(definitions.OutputPath, "insert_" + table.FullTableName + SqlExtension);
 
             if (File.Exists(fileName))
             {
@@ -27,12 +27,25 @@ public sealed class InsertStatementGenerator(
         }
     }
 
-    private string GenerateInsertStatement(DataTable schemaTable, InsertStatementDefinitions.Table table)
+    private string GenerateInsertStatement(DataTable schemaTable, InsertStatementDefinitions.Table table, InsertStatementDefinitions definitions)
     {
-        var fields = fieldGenerater.Generate(schemaTable, table).Where(field => !field.IsIdentity && !field.IsNullable && field.DataType != "timestamp");
-        var columnNames = fields.Select(p => p.ColumnName).ToList();
-        Random random = new();
-        var values = fields.Select(field => GenerateRandomValue(field, random)).ToList();
+        var fields = fieldGenerater.Generate(schemaTable, table).Where(field =>
+            !field.IsIdentity &&
+            field.DataType != "timestamp" &&
+            (definitions.IncludeNullable || !field.IsNullable));
+
+        var columnNames = GenerateColumnNames(fields);
+
+        List<string> values;
+        if (definitions.GenerateRandomValue)
+        {
+            Random random = new();
+            values = fields.Select(field => GenerateRandomValue(field, random)).ToList();
+        }
+        else
+        {
+            values = GenerateParameters(fields);
+        }
 
         return $"""
             INSERT INTO {table.FullTableName} (
@@ -43,17 +56,23 @@ public sealed class InsertStatementGenerator(
             """;
     }
 
+    private static List<string> GenerateColumnNames(IEnumerable<Field> fields)
+    {
+        return fields.Select(field => field.ColumnName).ToList();
+    }
+
+    private List<string> GenerateParameters(IEnumerable<Field> fields)
+    {
+        return fields.Select(field => $"@{field.ColumnName}").ToList();
+    }
+
     private string GenerateRandomValue(Field field, Random random)
     {
-        if (new Type[] { typeof(short), typeof(int), typeof(decimal), typeof(float), typeof(double) }.Contains(field.PropertyType))
+        if (new Type[] { typeof(byte), typeof(int), typeof(decimal), typeof(float), typeof(double) }.Contains(field.PropertyType))
         {
             return "1";
         }
-        else if (field.PropertyType == typeof(string))
-        {
-            return $"N'{randomTextGenerator.GenerateRandomText(Math.Min(field.MaxLength, 10))}'";
-        }
-        else if (field.PropertyType == typeof(char))
+        else if (field.PropertyType == typeof(string) || field.PropertyType == typeof(char))
         {
             return $"'{randomTextGenerator.GenerateRandomText(1)}'";
         }
