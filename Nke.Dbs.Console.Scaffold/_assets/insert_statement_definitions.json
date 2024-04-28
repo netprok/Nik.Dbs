@@ -3,11 +3,11 @@
     "ConnectionStringName": "eazybusiness",
     "OutputPath": "C:\\_output",
     "IncludeNullable": true,
-    "GenerateRandomValue": true,
+    "GenerateRandomValue": false,
     "Tables": [
       {
-        "TableName": "tAuftragAdresse",
-        "FullTableName": "Verkauf.tAuftragAdresse"
+        "TableName": "tAuftragPosition",
+        "FullTableName": "Verkauf.tAuftragPosition"
       }
     ]
   }
