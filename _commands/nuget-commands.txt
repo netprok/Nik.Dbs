@@ -1,5 +1,5 @@
-dotnet pack -c Release -p:Version=1.3.8
+dotnet pack -c Release -p:Version=1.0.0
 
-nuget add '.\Nik.Dbs\bin\Release\Nik.Dbs.1.3.8.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
-nuget add '.\Nik.Dbs.Abstractions\bin\Release\Nik.Dbs.Abstractions.1.3.8.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
-nuget add '.\Nik.Dbs.Models\bin\Release\Nik.Dbs.Models.1.3.8.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
+nuget add '.\Nik.Dbs\bin\Release\Nik.Dbs.1.0.0.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
+nuget add '.\Nik.Dbs.Abstractions\bin\Release\Nik.Dbs.Abstractions.1.0.0.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
+nuget add '.\Nik.Dbs.Models\bin\Release\Nik.Dbs.Models.1.0.0.nupkg' -source 'D:\OneDrive\Software Development\nik-nuget-package-source'
