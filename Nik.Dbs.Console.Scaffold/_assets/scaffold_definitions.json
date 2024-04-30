@@ -3,7 +3,7 @@
     "ConnectionStringName": "eazybusiness",
     "OutputPath": "C:\\_output",
     "AddUsings": false,
-    "Namespace": "Nke.Jtl.Models.Db",
+    "Namespace": "Nik.Jtl.Models.Db",
     "Tables": [
       {
         "TableName": "tZahlungsart",

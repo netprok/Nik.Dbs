@@ -1,4 +1,4 @@
-﻿namespace Nke.Dbs.Console.Scaffold;
+﻿namespace Nik.Dbs.Console.Scaffold;
 
 public class JtlScaffoldPropertyNameGenerater : IScaffoldPropertyNameGenerater
 {
