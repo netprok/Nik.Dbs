@@ -1,4 +1,4 @@
-﻿namespace Nik.Dbs;
+﻿namespace Nik.Dbs.Abstractions;
 
 public interface IFieldGenerater
 {

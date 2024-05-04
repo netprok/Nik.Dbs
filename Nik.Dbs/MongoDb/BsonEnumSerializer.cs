@@ -1,4 +1,4 @@
-﻿namespace Nik.Dbs;
+﻿namespace Nik.Dbs.MongoDb;
 
 public sealed class BsonEnumSerializer<T> : SerializerBase<T> where T : struct, Enum
 {
